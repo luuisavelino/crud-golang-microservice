@@ -31,6 +31,8 @@ func New(w http.ResponseWriter, r *http.Request) {
 }
 
 func Insert(w http.ResponseWriter, r *http.Request) {
+	produtos := models.New(apiKey)
+	
 	if r.Method == "POST" {
 		nome := r.FormValue("nome")
 		descricao := r.FormValue("descricao")
@@ -47,30 +49,39 @@ func Insert(w http.ResponseWriter, r *http.Request) {
 			log.Println("Erro na conversão da quantidade!", err.Error())
 		}
 
-		models.CriarNovoProduto(nome, descricao, precoConvertidoParaFloat, quantidadeConvertidaParaInt)
+		produtos.Create(nome, descricao, precoConvertidoParaFloat, quantidadeConvertidaParaInt)
 	}
 
 	http.Redirect(w, r, "/api/v1/", http.StatusMovedPermanently)
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
+	produtos := models.New(apiKey)
+	
 	idDoProduto := r.URL.Query().Get("id")
 
-	models.DeletaProduto(idDoProduto)
+	produtos.Delete(idDoProduto)
 
 	http.Redirect(w, r, "/api/v1/", http.StatusMovedPermanently)
 }
 
 func Edit(w http.ResponseWriter, r *http.Request) {
+	produtos := models.New(apiKey)
+
 	idDoProduto := r.URL.Query().Get("id")
 
-	produto := models.EditaProduto(idDoProduto)
+	produto, err := produtos.Read(idDoProduto)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	temp.ExecuteTemplate(w, "Edit", produto)
 }
 
 func Update(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	produtos := models.New(apiKey)
+
+	if r.Method == "PATCH" {
 		id := r.FormValue("id")
 		nome := r.FormValue("nome")
 		descricao := r.FormValue("descricao")
@@ -92,7 +103,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 			log.Println("Erro na conversão do quantidade para int:", err)
 		}
 
-		models.AtualizaProduto(idConvertidoParaInt, nome, descricao, precoConvertidoParaFloat, quantidadeConvertidaParaInt)
+		produtos.Update(idConvertidoParaInt, nome, descricao, precoConvertidoParaFloat, quantidadeConvertidaParaInt)
 	}
 
 	http.Redirect(w, r, "/api/v1/", http.StatusPermanentRedirect)

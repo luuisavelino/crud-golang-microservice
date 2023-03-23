@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"log"
 )
 
 const apiVersion = "/api/v1"
@@ -13,22 +14,22 @@ const apiVersion = "/api/v1"
 type Product struct {
 	Name        string
 	Description string
-	Price       string
+	Price       float64
 	Amount      int
 }
 
 type Actions interface {
 	SearchAll()
-	Get()
+	Read()
 	Delete()
-	AddNew()
+	Create()
 	Update()
 }
 
 func ApiConsume(method, apiKey, endpoint string, reqBody io.Reader) (io.Reader, error) {
 	client := &http.Client{}
 	req, err := http.NewRequest(
-		method, fmt.Sprintf(apiVersion+BaseURL+endpoint), reqBody)
+		method, fmt.Sprintf(BaseURL+apiVersion+endpoint), reqBody)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +48,7 @@ func ApiConsume(method, apiKey, endpoint string, reqBody io.Reader) (io.Reader, 
 func (p *Products) SearchAll() ([]Product, error) {
 	reqBody := bytes.NewBufferString(``)
 
-	Body, err := ApiConsume("GET", p.apiKey, "/", reqBody)
+	Body, err := ApiConsume(http.MethodGet, p.apiKey, "/", reqBody)
 	if err != nil {
 		return nil, err
 	}
@@ -60,10 +61,8 @@ func (p *Products) SearchAll() ([]Product, error) {
 	return produtos, nil
 }
 
-func (p *Products) Get(id string) (Product, error) {
-	reqBody := bytes.NewBufferString(``)
-
-	Body, err := ApiConsume("GET", p.apiKey, "/", reqBody)
+func (p *Products) Read(id string) (Product, error) {
+	Body, err := ApiConsume(http.MethodGet, p.apiKey, "/" + id, nil)
 	if err != nil {
 		return Product{}, err
 	}
@@ -77,13 +76,55 @@ func (p *Products) Get(id string) (Product, error) {
 }
 
 func (p *Products) Delete(id string) {
-	fmt.Println("Produto deletado")
+	body, err := ApiConsume(http.MethodDelete, p.apiKey, "/" + id, nil)
+
+    if err != nil {
+        log.Fatal(err)
+    }
+    log.Println(body)
 }
 
-func (p *Products) AddNew() {
-	fmt.Println("Novo produto criado")
+func (p *Products) Create(nome, descricao string, preco float64, quantidade int) {
+	
+	req, err := json.Marshal(Product{
+		Name: nome,
+		Description: descricao,
+		Price: preco,
+		Amount: quantidade,
+	})
+	if err != nil {
+        fmt.Println(err)
+        return
+    }
+	
+	reqBody := bytes.NewBufferString(string(req))
+
+	body, err := ApiConsume(http.MethodPost, p.apiKey, "/", reqBody)
+
+	if err != nil {
+        fmt.Println(err)
+    }
+    log.Println(body)
 }
 
-func (p *Products) Update() {
-	fmt.Println("Produto atualizado")
+func (p *Products) Update(id int, nome, descricao string, preco float64, quantidade int) {
+	req, err := json.Marshal(Product{
+		Name: nome,
+		Description: descricao,
+		Price: preco,
+		Amount: quantidade,
+	})
+	if err != nil {
+        fmt.Println(err)
+        return
+    }
+	
+	reqBody := bytes.NewBufferString(string(req))
+	
+	body, err := ApiConsume(http.MethodPatch, p.apiKey, "/" + string(id), reqBody)
+
+	if err != nil {
+        log.Fatal(err)
+    }
+    log.Println(body)
 }
