@@ -8,12 +8,7 @@ import (
 const apiVersion = "/api/v1"
 
 func HandlerRequest() {
-	http.HandleFunc(apiVersion + "/", controllers.Index)
-	http.HandleFunc(apiVersion + "/new", controllers.New)
-	http.HandleFunc(apiVersion + "/insert", controllers.Insert)
-	http.HandleFunc(apiVersion + "/delete", controllers.Delete)
-	http.HandleFunc(apiVersion + "/edit", controllers.Edit)
-	http.HandleFunc(apiVersion + "/update", controllers.Update)
+	http.HandleFunc(apiVersion + "/products", controllers.Products)
 
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8081", nil)
 }

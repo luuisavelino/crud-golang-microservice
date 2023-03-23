@@ -48,7 +48,7 @@ func ApiConsume(method, apiKey, endpoint string, reqBody io.Reader) (io.Reader, 
 func (p *Products) SearchAll() ([]Product, error) {
 	reqBody := bytes.NewBufferString(``)
 
-	Body, err := ApiConsume(http.MethodGet, p.apiKey, "/", reqBody)
+	Body, err := ApiConsume(http.MethodGet, p.apiKey, "/products", reqBody)
 	if err != nil {
 		return nil, err
 	}
