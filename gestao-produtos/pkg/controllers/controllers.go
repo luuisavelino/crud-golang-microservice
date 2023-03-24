@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/luuisavelino/crud-golang-microservice-gestao-produtos/pkg/models"
-	"net/http"
-	"encoding/json"
 )
 
 func Products(c *gin.Context) {
@@ -26,15 +26,11 @@ func DeleteProduct(c *gin.Context) {
 }
 
 func CreateProduct(c *gin.Context) {
-	var product models.Product
 
-	decoder := json.NewDecoder(c.Request.Body)
-	fmt.Println("decoder")
-	decoder.Decode(&product)
-
-	fmt.Println(product)
-
-	models.CriarNovoProduto(product)
+	c.Request.ParseMultipartForm(1000)
+	for key, value := range c.Request.PostForm {
+		fmt.Println(key, value)
+	}
 
 	c.JSON(http.StatusOK, "Item criado com sucesso!")
 }
@@ -43,10 +39,9 @@ func UpdateProduct(c *gin.Context) {
 	var product models.Product
 	id := c.Params.ByName("id")
 
-	decoder := json.NewDecoder(c.Request.Body)
-	decoder.Decode(&product)
-
-	fmt.Println(product)
+	if err := c.BindJSON(&product); err != nil {
+		panic(err)
+	}
 
 	models.AtualizaProduto(product)
 	c.JSON(http.StatusOK, "Id "+id+" editado com sucesso!")
