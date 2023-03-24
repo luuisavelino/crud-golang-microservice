@@ -88,11 +88,6 @@ func Update(w http.ResponseWriter, r *http.Request) {
 		preco := r.FormValue("preco")
 		quantidade := r.FormValue("quantidade")
 
-		idConvertidoParaInt, err := strconv.Atoi(id)
-		if err != nil {
-			log.Println("Erro na conversão do ID para int:", err)
-		}
-
 		precoConvertidoParaFloat, err := strconv.ParseFloat(preco, 64)
 		if err != nil {
 			log.Println("Erro na conversão do preco para float:", err)
@@ -103,7 +98,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 			log.Println("Erro na conversão do quantidade para int:", err)
 		}
 
-		produtos.Update(idConvertidoParaInt, nome, descricao, precoConvertidoParaFloat, quantidadeConvertidaParaInt)
+		produtos.Update(id, nome, descricao, precoConvertidoParaFloat, quantidadeConvertidaParaInt)
 	}
 
 	http.Redirect(w, r, "/api/v1/", http.StatusPermanentRedirect)

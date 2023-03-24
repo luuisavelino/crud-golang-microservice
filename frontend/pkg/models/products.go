@@ -62,7 +62,7 @@ func (p *Products) SearchAll() ([]Product, error) {
 }
 
 func (p *Products) Read(id string) (Product, error) {
-	Body, err := ApiConsume(http.MethodGet, p.apiKey, "/" + id, nil)
+	Body, err := ApiConsume(http.MethodGet, p.apiKey, "/products/" + id, nil)
 	if err != nil {
 		return Product{}, err
 	}
@@ -76,7 +76,7 @@ func (p *Products) Read(id string) (Product, error) {
 }
 
 func (p *Products) Delete(id string) {
-	body, err := ApiConsume(http.MethodDelete, p.apiKey, "/" + id, nil)
+	body, err := ApiConsume(http.MethodDelete, p.apiKey, "/products/" + id, nil)
 
     if err != nil {
         log.Fatal(err)
@@ -99,7 +99,7 @@ func (p *Products) Create(nome, descricao string, preco float64, quantidade int)
 	
 	reqBody := bytes.NewBufferString(string(req))
 
-	body, err := ApiConsume(http.MethodPost, p.apiKey, "/", reqBody)
+	body, err := ApiConsume(http.MethodPost, p.apiKey, "/products", reqBody)
 
 	if err != nil {
         fmt.Println(err)
@@ -107,7 +107,7 @@ func (p *Products) Create(nome, descricao string, preco float64, quantidade int)
     log.Println(body)
 }
 
-func (p *Products) Update(id int, nome, descricao string, preco float64, quantidade int) {
+func (p *Products) Update(id, nome, descricao string, preco float64, quantidade int) {
 	req, err := json.Marshal(Product{
 		Name: nome,
 		Description: descricao,
@@ -121,7 +121,7 @@ func (p *Products) Update(id int, nome, descricao string, preco float64, quantid
 	
 	reqBody := bytes.NewBufferString(string(req))
 	
-	body, err := ApiConsume(http.MethodPatch, p.apiKey, "/" + string(id), reqBody)
+	body, err := ApiConsume(http.MethodPatch, p.apiKey, "/products" + id, reqBody)
 
 	if err != nil {
         log.Fatal(err)
