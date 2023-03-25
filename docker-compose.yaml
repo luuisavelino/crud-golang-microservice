@@ -1,5 +1,13 @@
 version: '3'
 services:
+  gestao-produtos:
+    build: ./gestao-produtos
+    volumes:
+      - ./gestao-produtos:/go/app
+    platform: linux/amd64
+    networks:
+      - crud-golang-microservice
+
   postgres:
     image: "postgres"
     container_name: postgres
